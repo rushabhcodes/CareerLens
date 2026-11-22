@@ -2,21 +2,21 @@
 
 Executed locally on 22 November 2026 (Asia/Kolkata) against **MySQL Community Server 8.4.6**, Python 3.12, Django 5.2, React 19 and Vite 7. No SQLite substitute was used for backend validation.
 
-| Check | Executed result |
-|---|---|
-| Django suite | **36 passed** on a separate `test_careerlens` MySQL database |
-| React / Vitest suite | **8 passed** |
-| Playwright browser suite | **4 passed**, including the optional local staff flow |
-| Postman collection via Newman | **20 requests, 20 assertions, 0 failures** |
-| Production frontend build | Passed; chart and vendor code split into separate bundles |
-| OpenAPI schema | Passed `--validate --fail-on-warn` with no warnings |
-| Django model migration check | No ungenerated changes |
-| npm dependency audit | 0 vulnerabilities reported in the installed dependency set |
-| Bootstrap rerun | Passed with existing secrets and database records preserved |
-| Private MySQL stop/start | Passed; database records remained available |
-| Application dev helper start/stop/start | Passed; backend and frontend responded after restart |
-| Academic DOCX | Rendered and visually reviewed |
-| Academic PowerPoint | 18 slides rendered and reviewed; package, geometry, fonts and first-party reimport checks passed; actual screenshot media verified |
+| Check                                   | Executed result                                                                                                                    |
+| --------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| Django suite                            | **36 passed** on a separate `test_careerlens` MySQL database                                                                       |
+| React / Vitest suite                    | **8 passed**                                                                                                                       |
+| Playwright browser suite                | **4 passed**, including the optional local staff flow                                                                              |
+| Postman collection via Newman           | **20 requests, 20 assertions, 0 failures**                                                                                         |
+| Production frontend build               | Passed; chart and vendor code split into separate bundles                                                                          |
+| OpenAPI schema                          | Passed `--validate --fail-on-warn` with no warnings                                                                                |
+| Django model migration check            | No ungenerated changes                                                                                                             |
+| npm dependency audit                    | 0 vulnerabilities reported in the installed dependency set                                                                         |
+| Bootstrap rerun                         | Passed with existing secrets and database records preserved                                                                        |
+| Private MySQL stop/start                | Passed; database records remained available                                                                                        |
+| Application dev helper start/stop/start | Passed; backend and frontend responded after restart                                                                               |
+| Academic DOCX                           | Rendered and visually reviewed                                                                                                     |
+| Academic PowerPoint                     | 18 slides rendered and reviewed; package, geometry, fonts and first-party reimport checks passed; actual screenshot media verified |
 
 ## Backend coverage
 
@@ -51,4 +51,28 @@ The browser tests use the real API and database. Test-only sample accounts remai
 
 ## Verification limits
 
-No live LLM-provider call was executed because credentials were not supplied. Provider success, bad schemas, timeouts and rate limits were tested with mocks. OCR is intentionally not configured. Scoring heuristics have not been validated against hiring outcomes. Public deployment, production load, multi-browser coverage beyond Chromium and native Microsoft PowerPoint execution were not tested. The Docker alternative is supplied but was not executed on this workstation, where Docker is not installed.
+No live LLM-provider call was executed because credentials were not supplied. Provider success, bad schemas, timeouts and rate limits were tested with mocks. OCR is intentionally not configured. Scoring heuristics have not been validated against hiring outcomes. The initial local checks did not cover public deployment; functional hosted checks are recorded below. Production load, multi-browser coverage beyond Chromium and native Microsoft PowerPoint execution were not tested. The Docker alternative is supplied but was not executed on this workstation, where Docker is not installed.
+
+## Hosted demo verification — 23 November 2026
+
+The application was deployed to **https://careerlens.rushabh.dev/** using Vercel frontend/backend Services and Neon PostgreSQL. These checks used the real hosted API and database, with fictional candidate information:
+
+| Check                                 | Executed result                                                                                                                                                                                                                         |
+| ------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Updated backend suite on MySQL        | **39 passed**, including persistent serverless originals, owner-only downloads, deletion, hosted upload limits and sample workspaces with debug disabled                                                                                |
+| Same backend suite on Neon PostgreSQL | **39 passed** on the separate `test_careerlens` database; the application database was not used as the test database                                                                                                                    |
+| React suite                           | **8 passed**                                                                                                                                                                                                                            |
+| Frontend production build             | Passed; malformed mobile CSS was corrected and the build's CSS warnings were eliminated                                                                                                                                                 |
+| Hosted configuration / migrations     | Django checks passed and no pending model migration changes                                                                                                                                                                             |
+| Anonymous custom-domain access        | HTTPS frontend, one-click sample workspace, Django login page and admin static CSS responded without Vercel sign-in                                                                                                                     |
+| Hosted workspace API                  | Dashboard, resumes, jobs, matches, careers and history returned authenticated JSON successfully                                                                                                                                         |
+| New-account workflow                  | Registration started empty; a PDF uploaded, extracted and persisted; a later request downloaded its original                                                                                                                            |
+| Ownership and staff access            | Another account could not download the original; regular users received 403 from staff statistics                                                                                                                                       |
+| Deletion and logout                   | Deletion removed the resume; its original became unavailable; logout revoked the token and subsequent account access returned 401                                                                                                       |
+| Recorded browser walkthrough          | Completed PDF and DOCX upload, private original/report downloads, evidence expansion, job creation/editing, matching, gaps, optional-advice fallback, career plans, history/search, persisted profile updates, methodology and deletion |
+| Staff walkthrough                     | Private authenticated staff session opened statistics, Django administration and the skill catalog without filming credentials                                                                                                          |
+| Mobile walkthrough                    | Dashboard, navigation and skill roadmap completed at 390 × 844, with no horizontal overflow                                                                                                                                             |
+
+The walkthrough uses genuine browser interaction, with no mocked network responses. No browser exceptions or HTTP 5xx responses were observed by the recorder. The MP4 and captions are included under `docs/demo/`.
+
+The hosted demo uses a 4 MiB upload limit and private PostgreSQL-backed originals; local MySQL installations retain the 5 MiB default and private filesystem originals. Optional provider credentials remain unset, so the recording demonstrates the labeled local fallback. Hosted functional checks do not establish production capacity or hiring-score validity.

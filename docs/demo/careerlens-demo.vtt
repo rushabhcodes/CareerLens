@@ -1,0 +1,121 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:06.175
+CareerLens
+A real walkthrough at careerlens.rushabh.dev · fictional candidate data
+
+00:00:06.175 --> 00:00:11.927
+Accounts
+Create your own workspace or explore instantly with sample data.
+
+00:00:11.927 --> 00:00:22.553
+Dashboard
+Resume scores, job comparisons, skill gaps and career directions in one view.
+
+00:00:22.553 --> 00:00:26.622
+Progress at a glance
+Review recent analyses and recommended next steps.
+
+00:00:26.622 --> 00:00:41.112
+Resume library
+Organize versions and download private originals.
+
+00:00:41.112 --> 00:00:49.438
+PDF upload
+Upload a selectable-text PDF or DOCX. The hosted demo accepts files up to 4 MiB.
+
+00:00:49.438 --> 00:00:59.056
+Resume analysis
+Candidate details, section checks and a quality score with every point explained.
+
+00:00:59.056 --> 00:01:05.281
+Actionable feedback
+See score components and practical suggestions before revising your resume.
+
+00:01:05.281 --> 00:01:12.438
+Skill evidence
+Open a detected skill to inspect the exact supporting resume text.
+
+00:01:12.438 --> 00:01:17.573
+DOCX support
+Word resumes use the same extraction, skill matching and scoring pipeline.
+
+00:01:17.573 --> 00:01:24.021
+Job descriptions
+Save a target role, experience and qualifications. Skills can be detected from its text.
+
+00:01:24.021 --> 00:01:30.008
+Editable requirements
+Review detected skills and set essential or preferred importance.
+
+00:01:30.008 --> 00:01:38.289
+Job matching
+Compare skills, explicit experience and qualifications. Scores measure documented alignment.
+
+00:01:38.289 --> 00:01:45.572
+Matched, related and missing
+Related skills earn partial credit. Missing requirements remain visible.
+
+00:01:45.572 --> 00:01:50.848
+Transparent scoring
+Review the weighted calculation and the evidence behind each component.
+
+00:01:50.848 --> 00:02:04.939
+Skill gap roadmap
+Turn missing skills into prioritized actions, milestones and learning resources.
+
+00:02:04.939 --> 00:02:12.101
+Career recommendations
+Explore roles ranked by explicit skill coverage. Provider enrichment is optional.
+
+00:02:12.101 --> 00:02:19.200
+Personal learning plans
+Without provider credentials, CareerLens keeps the labeled rule-based result.
+
+00:02:19.200 --> 00:02:26.238
+Analysis history
+Reopen saved resume reviews, job matches and career recommendations.
+
+00:02:26.238 --> 00:02:30.444
+Search saved work
+Filter previous analyses without losing the underlying reports.
+
+00:02:30.444 --> 00:02:39.683
+Profile and persistence
+Save your career goal. Account-owned data persists beyond the current page.
+
+00:02:39.683 --> 00:02:50.359
+How scoring works
+Read the formulas, parsing limits, privacy controls and optional AI behavior.
+
+00:02:50.359 --> 00:02:54.773
+Control your files
+Deletion removes the original document and its dependent analyses.
+
+00:02:54.773 --> 00:03:01.839
+Your next chapter
+Try it yourself: careerlens.rushabh.dev · Explore sample workspace
+
+00:03:01.839 --> 00:03:09.608
+Staff administration
+Authorized staff can inspect application statistics. Visitors cannot access this module.
+
+00:03:09.608 --> 00:03:15.735
+Django administration
+Manage the shared catalog through the permission-protected staff interface.
+
+00:03:15.735 --> 00:03:22.701
+Managed skill catalog
+Maintain skills, aliases, related-skill relationships, roles and learning resources.
+
+00:03:22.701 --> 00:03:28.730
+Mobile workspace
+The dashboard adapts to a phone-sized screen.
+
+00:03:28.730 --> 00:03:33.083
+Mobile navigation
+Open the menu to reach every workspace module.
+
+00:03:33.083 --> 00:03:39.033
+Learning on the go
+Review skill gaps and practical next steps on mobile.

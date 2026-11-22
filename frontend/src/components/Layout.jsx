@@ -20,6 +20,7 @@ import {
 } from 'lucide-react'
 import { useAuth } from '../auth'
 import { Brand, useToast } from './ui'
+import { PUBLIC_DEMO } from '../config'
 
 const primary = [
   ['/', 'Overview', LayoutDashboard],
@@ -160,7 +161,10 @@ export default function Layout() {
         {sample && (
           <div className="sample-banner">
             <span>Sample workspace</span> All resumes, jobs and candidate details here are synthetic
-            demonstration data stored in MySQL.
+            demonstration data.{' '}
+            {PUBLIC_DEMO
+              ? 'Please use synthetic resumes in this public demo.'
+              : 'Stored in your local database.'}
           </div>
         )}
         <main id="main-content" className="main-content">

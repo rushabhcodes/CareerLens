@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+from urllib.parse import parse_qs, unquote, urlparse
 from dotenv import load_dotenv
 from django.core.exceptions import ImproperlyConfigured
 
@@ -12,6 +13,9 @@ if not SECRET_KEY:
         "Set DJANGO_SECRET_KEY in .env before starting CareerLens."
     )
 ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
+for variable in ("VERCEL_URL", "VERCEL_PROJECT_PRODUCTION_URL"):
+    if os.getenv(variable):
+        ALLOWED_HOSTS.append(os.environ[variable])
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -36,6 +40,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 ROOT_URLCONF = "config.urls"
+ADMIN_PATH = os.getenv("DJANGO_ADMIN_PATH", "admin/")
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -68,6 +73,27 @@ DATABASES = {
         "TEST": {"NAME": "test_careerlens"},
     }
 }
+if os.getenv("DATABASE_URL"):
+    database_url = urlparse(os.environ["DATABASE_URL"])
+    if database_url.scheme not in {"postgres", "postgresql"}:
+        raise ImproperlyConfigured("DATABASE_URL must be a PostgreSQL connection URL.")
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": unquote(database_url.path.lstrip("/")),
+            "USER": unquote(database_url.username or ""),
+            "PASSWORD": unquote(database_url.password or ""),
+            "HOST": database_url.hostname,
+            "PORT": database_url.port or 5432,
+            "CONN_MAX_AGE": 0,
+            "DISABLE_SERVER_SIDE_CURSORS": True,
+            "OPTIONS": {
+                "sslmode": parse_qs(database_url.query).get("sslmode", ["require"])[0],
+                "connect_timeout": 15,
+            },
+            "TEST": {"NAME": "test_careerlens"},
+        }
+    }
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
@@ -86,6 +112,14 @@ USE_TZ = True
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 MEDIA_ROOT = BASE_DIR / "private_media"
+if os.getenv("PRIVATE_FILE_STORAGE") == "database":
+    STORAGES = {
+        "default": {"BACKEND": "core.storage.DatabaseFileStorage"},
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"
+        },
+    }
+MAX_UPLOAD_MIB = int(os.getenv("MAX_UPLOAD_MIB", "5"))
 FILE_UPLOAD_PERMISSIONS = 0o600
 FILE_UPLOAD_DIRECTORY_PERMISSIONS = 0o700
 DATA_UPLOAD_MAX_MEMORY_SIZE = 6 * 1024 * 1024
@@ -128,7 +162,7 @@ SPECTACULAR_SETTINGS = {
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
 }
-DEMO_ENABLED = DEBUG and os.getenv("DEMO_ENABLED", "true").lower() == "true"
+DEMO_ENABLED = os.getenv("DEMO_ENABLED", "true" if DEBUG else "false").lower() == "true"
 LLM_API_KEY = os.getenv("LLM_API_KEY", "")
 LLM_BASE_URL = os.getenv("LLM_BASE_URL", "")
 LLM_MODEL = os.getenv("LLM_MODEL", "")

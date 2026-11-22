@@ -330,4 +330,12 @@ CREATE TABLE `django_session` (
   KEY `django_session_expire_date_a5c62663` (`expire_date`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+-- Private originals used by the optional serverless storage backend.
+CREATE TABLE `core_privatedocument` (
+  `name` varchar(255) NOT NULL,
+  `content` longblob NOT NULL,
+  `created_at` datetime(6) NOT NULL,
+  PRIMARY KEY (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
 SET FOREIGN_KEY_CHECKS=1;

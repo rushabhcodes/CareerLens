@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#102c28" />
+    <title>CareerLens — Project walkthrough</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: #102c28;
+        color: #f4f7ed;
+        font:
+          16px/1.6 system-ui,
+          sans-serif;
+      }
+      main {
+        max-width: 1120px;
+        margin: auto;
+        padding: 40px 24px;
+      }
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+      }
+      .brand {
+        font-size: 24px;
+        font-weight: 750;
+        letter-spacing: -0.7px;
+      }
+      a {
+        color: #cde3b2;
+        text-underline-offset: 4px;
+      }
+      .eyebrow {
+        margin: 40px 0 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        color: #b1ccb6;
+        font-size: 13px;
+      }
+      h1 {
+        margin: 0 0 12px;
+        font-size: clamp(28px, 4vw, 44px);
+        line-height: 1.15;
+        letter-spacing: -1.3px;
+      }
+      p {
+        color: #bed0c5;
+        max-width: 750px;
+      }
+      video {
+        display: block;
+        width: 100%;
+        max-height: 76vh;
+        margin: 28px 0 20px;
+        background: #091e1a;
+        border: 1px solid #355047;
+        border-radius: 12px;
+      }
+      .links {
+        display: flex;
+        gap: 24px;
+        flex-wrap: wrap;
+      }
+      footer {
+        margin-top: 36px;
+        border-top: 1px solid #355047;
+        padding-top: 20px;
+        color: #b1c1b7;
+        font-size: 14px;
+      }
+      :focus-visible {
+        outline: 3px solid #cde3b2;
+        outline-offset: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <a class="brand" href="/">CareerLens</a>
+        <a href="/">Open the live demo</a>
+      </header>
+      <p class="eyebrow">The project, in action</p>
+      <h1>A clearer view of your next chapter.</h1>
+      <p>
+        Watch a real browser walkthrough of resume analysis, job matching, learning roadmaps, career
+        recommendations, staff administration and mobile navigation.
+      </p>
+      <video
+        controls
+        playsinline
+        preload="metadata"
+        poster="poster.jpg"
+        aria-label="CareerLens feature walkthrough"
+      >
+        <source src="careerlens-demo.mp4" type="video/mp4" />
+        <track kind="captions" src="careerlens-demo.vtt" srclang="en" label="English" />
+        Your browser cannot play this video. <a href="careerlens-demo.mp4">Download the MP4</a>.
+      </video>
+      <div class="links">
+        <a href="careerlens-demo.mp4" download>Download the recording</a>
+        <a href="https://github.com/rushabhcodes/CareerLens">View the source and setup guide</a>
+      </div>
+      <footer>
+        This recording uses fictional candidate details. Captions are included; there is no
+        narration. Optional provider advice is shown with its honest local fallback. Staff screens
+        require a private administrator account.
+      </footer>
+    </main>
+  </body>
+</html>

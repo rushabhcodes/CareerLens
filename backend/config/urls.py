@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.conf import settings
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
@@ -12,7 +13,7 @@ router.register("careers", views.CareerViewSet, basename="career")
 router.register("history", views.HistoryViewSet, basename="history")
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
+    path(settings.ADMIN_PATH, admin.site.urls),
     path("api/auth/register/", views.register),
     path("api/auth/login/", views.login),
     path("api/auth/logout/", views.logout),

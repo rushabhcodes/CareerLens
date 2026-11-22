@@ -7,10 +7,10 @@ import pymupdf as fitz
 import spacy
 from spacy.matcher import PhraseMatcher
 from docx import Document
+from django.conf import settings
 from rest_framework.exceptions import ValidationError
 from core.models import Skill
 
-MAX_SIZE = 5 * 1024 * 1024
 SECTION_ALIASES = {
     "education": [
         "education",
@@ -45,15 +45,20 @@ SECTION_ALIASES = {
 
 
 def extract_file(upload):
+    max_size = settings.MAX_UPLOAD_MIB * 1024 * 1024
     ext = Path(upload.name).suffix.lower()
     if ext not in {".pdf", ".docx"}:
         raise ValidationError({"file": "Upload a PDF or DOCX resume."})
-    if upload.size > MAX_SIZE:
-        raise ValidationError({"file": "The maximum file size is 5 MiB."})
-    raw = upload.read(MAX_SIZE + 1)
+    if upload.size > max_size:
+        raise ValidationError(
+            {"file": f"The maximum file size is {settings.MAX_UPLOAD_MIB} MiB."}
+        )
+    raw = upload.read(max_size + 1)
     upload.seek(0)
-    if len(raw) > MAX_SIZE:
-        raise ValidationError({"file": "The maximum file size is 5 MiB."})
+    if len(raw) > max_size:
+        raise ValidationError(
+            {"file": f"The maximum file size is {settings.MAX_UPLOAD_MIB} MiB."}
+        )
     try:
         if ext == ".pdf":
             if not raw.startswith(b"%PDF-"):
@@ -226,11 +231,9 @@ def quality_report(text, info, skill_count):
         },
         {
             "name": "Text length",
-            "score": 10
-            if 150 <= word_count <= 1200
-            else 5
-            if 60 <= word_count < 150
-            else 0,
+            "score": (
+                10 if 150 <= word_count <= 1200 else 5 if 60 <= word_count < 150 else 0
+            ),
             "maximum": 10,
             "explanation": f"{word_count} words. 150–1200 words earns 10 points; 60–149 earns 5; other lengths earn 0.",
         },

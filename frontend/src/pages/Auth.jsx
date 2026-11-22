@@ -4,6 +4,7 @@ import { ArrowRight, ArrowUpRight, ScanText, Compass, Check, Eye, EyeOff } from 
 import { useAuth } from '../auth'
 import { errorMessage } from '../api'
 import { Brand, Button, Field } from '../components/ui'
+import { PUBLIC_DEMO } from '../config'
 
 export default function Auth() {
   const { user, authenticate } = useAuth()
@@ -210,7 +211,9 @@ export default function Auth() {
           <p className="auth-fineprint">
             Explore with clearly labeled synthetic resumes and jobs.
             <br />
-            No account details or API key needed.
+            {PUBLIC_DEMO
+              ? 'Public demo: please use fictional candidate details.'
+              : 'No account details or API key needed.'}
           </p>
           <div className="auth-trust">
             <Check size={14} />

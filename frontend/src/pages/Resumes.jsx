@@ -12,6 +12,7 @@ import {
 } from 'lucide-react'
 import { api, downloadFile, errorMessage } from '../api'
 import { useData } from '../hooks'
+import { MAX_UPLOAD_MIB } from '../config'
 import {
   Badge,
   Button,
@@ -39,7 +40,8 @@ export function UploadModal({ onClose, onUploaded }) {
     setError('')
     if (!selected) return
     if (!/\.(pdf|docx)$/i.test(selected.name)) return setError('Choose a PDF or DOCX file.')
-    if (selected.size > 5 * 1024 * 1024) return setError('Your resume must be 5 MiB or smaller.')
+    if (selected.size > MAX_UPLOAD_MIB * 1024 * 1024)
+      return setError(`Your resume must be ${MAX_UPLOAD_MIB} MiB or smaller.`)
     setFile(selected)
     if (!title) setTitle(selected.name.replace(/\.(pdf|docx)$/i, '').slice(0, 160))
   }
@@ -99,7 +101,7 @@ export function UploadModal({ onClose, onUploaded }) {
           <span>
             {file
               ? `${(file.size / 1024).toFixed(1)} KB · Click to choose another file`
-              : 'PDF or DOCX · Up to 5 MiB · Maximum 30 PDF pages'}
+              : `PDF or DOCX · Up to ${MAX_UPLOAD_MIB} MiB · Maximum 30 PDF pages`}
           </span>
         </button>
         <Field label="Resume title">

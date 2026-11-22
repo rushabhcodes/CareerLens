@@ -5,13 +5,13 @@ CareerLens helps a student or job seeker understand the evidence in a resume, co
 ## Requirements and acceptance
 
 1. Register, log in, revoke a token on logout, edit a profile and isolate all user-owned records.
-2. Upload PDF or DOCX up to 5 MiB. Validate content as well as extension, extract text, reject scans with an actionable OCR message, retain originals in private storage and authorize downloads.
+2. Upload PDF or DOCX up to 5 MiB locally or 4 MiB on the hosted Vercel demo. Validate content as well as extension, extract text, reject scans with an actionable OCR message, retain originals in private storage and authorize downloads.
 3. Extract contact details, section evidence and vocabulary-based skills with spaCy phrase matching. Display unknown fields honestly. Explain every quality component and show the extracted text.
 4. Create, edit, search and delete jobs with weighted essential/preferred requirements, experience and qualification text.
 5. Persist a versioned match with full, related and missing skills, scored components, qualification evidence and caveats. Persist its skill gaps and learning roadmap in the same transaction.
 6. Recommend roles from an administrator-managed catalog. Persist role recommendations and learning resources.
 7. Validate optional provider output against a strict schema, allow only configured HTTPS endpoints, enforce a timeout and fall back on invalid responses, rate limits or network errors. Credentials stay on the server.
-8. Derive dashboard metrics, trends, top skills and history from the logged-in user's MySQL records. Empty accounts show empty states.
+8. Derive dashboard metrics, trends, top skills and history from the logged-in user's database records. MySQL is the local default; the hosted demo uses PostgreSQL. Empty accounts show empty states.
 9. Expose staff-only operational statistics and Django admin catalog management.
 10. Provide reproducible tests, API/Postman documentation, diagrams, a report, slides and a demonstration guide.
 
@@ -25,13 +25,15 @@ flowchart LR
   S --> P[PyMuPDF and python docx]
   S --> N[spaCy vocabulary matcher and scoring]
   S --> L[Optional HTTPS LLM provider]
-  A --> D[(MySQL)]
-  A --> F[Private resume filesystem]
+  A --> D[(MySQL locally / PostgreSQL hosted)]
+  A --> F[Private originals: filesystem locally / database when hosted]
   Admin[Staff administrator] --> DA[Django admin]
   DA --> D
 ```
 
 ## Database ER diagram
+
+The hosted demo adds a `PrivateDocument` storage table containing a private generated filename, binary original and creation timestamp. `Resume.file` identifies that original through the configured Django storage backend. Its owner-checked download endpoint and deletion behavior are the same as with local filesystem storage. See [DEPLOYMENT.md](DEPLOYMENT.md).
 
 ```mermaid
 erDiagram

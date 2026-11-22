@@ -4,17 +4,25 @@ An explainable resume analysis and career planning application for an MCA Semest
 
 CareerLens runs locally without an AI API key. The default engine is explicitly labeled **rule-based**. Optional OpenAI-compatible provider enrichment produces learning advice only; extracted candidate facts and numerical scores remain deterministic.
 
+**[Open the live demo](https://careerlens.rushabh.dev/)** · **[Watch the feature walkthrough](https://careerlens.rushabh.dev/demo/)** · [MP4 in this repository](docs/demo/careerlens-demo.mp4)
+
+Choose **Explore sample workspace** to try the project immediately with fictional candidate data. Every visitor gets a separate workspace. The hosted demo runs the real Django API on Vercel with Neon PostgreSQL and private database-backed originals; the local setup below defaults to MySQL. Hosted uploads are limited to **4 MiB**. Optional AI provider credentials are not configured, so learning advice uses its labeled local fallback.
+
+[![CareerLens project walkthrough](docs/demo/poster.jpg)](https://careerlens.rushabh.dev/demo/)
+
+The [video guide and chapters](docs/demo/README.md) cover PDF/DOCX uploads, resume analysis and evidence, downloads, job management, matching, skill gaps, career pathways, history, profiles, scoring explanations, staff administration and mobile navigation. See [deployment instructions](docs/DEPLOYMENT.md) to reproduce the hosted setup.
+
 ## Run on your own device
 
 The setup below provides commands for Linux, macOS and Windows PowerShell. MySQL runs in Docker; Python and Node.js run on your device. An existing MySQL installation can be used instead. Local execution was verified on Arch Linux; native Windows, macOS and the Docker alternative have not been executed here.
 
 ### 1. Install the prerequisites
 
-| Tool | Requirement |
-| --- | --- |
-| [Git](https://git-scm.com/downloads) | To clone this repository |
-| [uv](https://docs.astral.sh/uv/getting-started/installation/) | Installs Python 3.12 and the backend dependencies |
-| [Node.js and npm](https://nodejs.org/en/download) | Node.js 22.12+ in the 22.x line, or Node.js 24.x |
+| Tool                                                            | Requirement                                                                                                        |
+| --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| [Git](https://git-scm.com/downloads)                            | To clone this repository                                                                                           |
+| [uv](https://docs.astral.sh/uv/getting-started/installation/)   | Installs Python 3.12 and the backend dependencies                                                                  |
+| [Node.js and npm](https://nodejs.org/en/download)               | Node.js 22.12+ in the 22.x line, or Node.js 24.x                                                                   |
 | [Docker with Compose](https://docs.docker.com/compose/install/) | Docker Desktop on Windows/macOS, or Docker Engine with the Compose plugin on Linux; start Docker before continuing |
 
 You need internet access for the initial dependency and database-image downloads. No AI subscription, API key or spaCy model download is required.
@@ -132,16 +140,16 @@ These helpers are for Linux; use the manual server commands above on Windows/mac
 
 ### Troubleshooting
 
-| Problem | What to check |
-| --- | --- |
-| `uv`, `node`, `npm` or `docker` is not found | Install the prerequisite and reopen your terminal so its PATH is refreshed. |
-| Docker cannot connect to its daemon | Start Docker Desktop or the Docker Engine service. |
-| MySQL connection refused during migrations | Wait for `docker compose ps` to show healthy; check `MYSQL_HOST` and `MYSQL_PORT` in `.env`. Inspect startup errors with `docker compose logs db`. |
-| MySQL access denied | Verify the database user/password in `.env`. An existing Docker volume keeps its original credentials; editing `.env` does not reset database passwords. |
-| `ModuleNotFoundError` | Activate this checkout's `.venv`, or use its Python executable directly; repeat the dependency-install command in step 2. |
-| Frontend opens but API calls fail | Keep Django running on `127.0.0.1:8000`. Vite proxies API requests to that address. |
-| Port 8000 or 5173 is already in use | Stop the previous server using that port. If Vite selects a different port, free 5173 and restart to match the supplied origin configuration. |
-| A scanned PDF cannot be read | Use a PDF containing selectable text or a DOCX file; OCR is not configured. |
+| Problem                                      | What to check                                                                                                                                            |
+| -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `uv`, `node`, `npm` or `docker` is not found | Install the prerequisite and reopen your terminal so its PATH is refreshed.                                                                              |
+| Docker cannot connect to its daemon          | Start Docker Desktop or the Docker Engine service.                                                                                                       |
+| MySQL connection refused during migrations   | Wait for `docker compose ps` to show healthy; check `MYSQL_HOST` and `MYSQL_PORT` in `.env`. Inspect startup errors with `docker compose logs db`.       |
+| MySQL access denied                          | Verify the database user/password in `.env`. An existing Docker volume keeps its original credentials; editing `.env` does not reset database passwords. |
+| `ModuleNotFoundError`                        | Activate this checkout's `.venv`, or use its Python executable directly; repeat the dependency-install command in step 2.                                |
+| Frontend opens but API calls fail            | Keep Django running on `127.0.0.1:8000`. Vite proxies API requests to that address.                                                                      |
+| Port 8000 or 5173 is already in use          | Stop the previous server using that port. If Vite selects a different port, free 5173 and restart to match the supplied origin configuration.            |
+| A scanned PDF cannot be read                 | Use a PDF containing selectable text or a DOCX file; OCR is not configured.                                                                              |
 
 ## Administration
 
@@ -224,6 +232,8 @@ On Linux, Playwright may also require its browser system dependencies; install t
 
 `backend/core/models.py` defines tables and relationships. `serializers.py` validates requests and shapes JSON. `views.py` authenticates the caller and selects only their records. Services do the actual extraction and scoring. `frontend/src/api.js` adds the token to API requests; `auth.jsx` stores the current account; `pages/` contains the screens. The API is the only layer that talks to MySQL. A React route guard improves navigation, while backend permissions enforce security.
 
-## Deployment boundary
+## Hosted deployment
 
-This repository is a working local academic application, not a verified public deployment. Before public use, set `DJANGO_DEBUG=false`, disable sample workspaces, configure hostnames and HTTPS, enable secure redirects behind a correctly configured reverse proxy, use a production WSGI server, back up MySQL and private files, configure persistent throttling, and review data retention. Build the frontend with `npm --prefix frontend run build` and serve `frontend/dist` with SPA fallback. Proxy `/api`, `/admin` and `/static` to the proper backend/static services. Configure `VITE_API_BASE` and `VITE_ADMIN_URL` at build time only when paths differ. Never serve `backend/private_media` as public static files.
+The shareable academic demo is **[careerlens.rushabh.dev](https://careerlens.rushabh.dev/)**. Vercel Services route the React frontend and Django backend under one HTTPS domain. Sample workspaces are explicitly enabled with `DJANGO_DEBUG=false`. Private uploads persist in PostgreSQL across function instances and remain accessible only to their owner; local MySQL installations keep their existing private filesystem storage.
+
+See [DEPLOYMENT.md](docs/DEPLOYMENT.md) for account setup, environment variables, migrations, redeployment and limits. This is an academic demonstration with functional checks, not a production load or security certification. Never serve `backend/private_media` as public static files or commit credentials.

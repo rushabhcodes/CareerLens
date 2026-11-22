@@ -4417,7 +4417,7 @@ td {
 .form-help {
   color: #71865b;
 }
-+ @media(max-width:767px) {
+@media (max-width: 767px) {
   .page-heading p {
     font-size: 11px;
   }
@@ -4485,18 +4485,7 @@ td {
     font-size: 10px;
   }
 }
-+ CSS
-  .venv/bin/python
-  backend/manage.py
-  check
-  command
-  -v
-  dot
-  npm
-  --prefix
-  frontend
-  ls
-  @playwright/test@media(max-width:1023px) {
+@media (max-width: 1023px) {
   .sidebar {
     visibility: hidden;
   }

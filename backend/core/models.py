@@ -23,6 +23,14 @@ class Profile(models.Model):
     career_goal = models.CharField(max_length=240, blank=True)
 
 
+class PrivateDocument(models.Model):
+    """Small private originals retained across serverless function instances."""
+
+    name = models.CharField(max_length=255, primary_key=True)
+    content = models.BinaryField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
 class Skill(models.Model):
     name = models.CharField(max_length=100, unique=True)
     category = models.CharField(

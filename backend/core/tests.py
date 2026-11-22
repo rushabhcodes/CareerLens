@@ -3,7 +3,6 @@ import json
 import tempfile
 import zipfile
 from datetime import timedelta
-from pathlib import Path
 from unittest.mock import patch, Mock
 import pymupdf as fitz
 import requests
@@ -186,7 +185,7 @@ class CareerLensTests(TestCase):
         self.assertIn("Python", names)
         self.assertNotIn("Docker", names)
         resume = Resume.objects.get(pk=response.data["id"])
-        self.assertTrue(Path(resume.file.path).exists())
+        self.assertTrue(resume.file.storage.exists(resume.file.name))
         self.assertTrue(
             AnalysisHistory.objects.filter(resume=resume, kind="resume").exists()
         )
@@ -282,7 +281,7 @@ class CareerLensTests(TestCase):
     def test_original_download_is_private_and_delete_removes_file(self):
         response = self.upload()
         pk = response.data["id"]
-        path = Resume.objects.get(pk=pk).file.path
+        original = Resume.objects.get(pk=pk).file
         self.assertEqual(
             self.client.get(f"/api/resumes/{pk}/download/").status_code, 200
         )
@@ -294,7 +293,7 @@ class CareerLensTests(TestCase):
         self.assertEqual(self.client.delete(f"/api/resumes/{pk}/").status_code, 404)
         self.client.force_authenticate(self.owner)
         self.assertEqual(self.client.delete(f"/api/resumes/{pk}/").status_code, 204)
-        self.assertFalse(Path(path).exists())
+        self.assertFalse(original.storage.exists(original.name))
 
     def test_job_crud_and_auto_detected_requirements(self):
         response = self.client.post(
@@ -521,3 +520,50 @@ class CareerLensTests(TestCase):
         self.assertEqual(
             self.client.post("/api/auth/demo/", {}, format="json").status_code, 404
         )
+
+    @override_settings(
+        STORAGES={
+            "default": {"BACKEND": "core.storage.DatabaseFileStorage"},
+            "staticfiles": {
+                "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"
+            },
+        }
+    )
+    def test_serverless_original_persists_across_storage_instances_and_stays_private(
+        self,
+    ):
+        from core.models import PrivateDocument
+        from core.storage import DatabaseFileStorage
+
+        response = self.upload()
+        self.assertEqual(response.status_code, 201, response.data)
+        resume = Resume.objects.get(pk=response.data["id"])
+        self.assertTrue(PrivateDocument.objects.filter(pk=resume.file.name).exists())
+        with DatabaseFileStorage().open(resume.file.name) as original:
+            self.assertTrue(original.read().startswith(b"%PDF-"))
+        self.client.force_authenticate(self.other)
+        self.assertEqual(
+            self.client.get(f"/api/resumes/{resume.pk}/download/").status_code, 404
+        )
+        self.client.force_authenticate(self.owner)
+        download = self.client.get(f"/api/resumes/{resume.pk}/download/")
+        self.assertEqual(download.status_code, 200)
+        self.assertTrue(b"".join(download.streaming_content).startswith(b"%PDF-"))
+        self.client.delete(f"/api/resumes/{resume.pk}/")
+        self.assertFalse(PrivateDocument.objects.filter(pk=resume.file.name).exists())
+
+    @override_settings(MAX_UPLOAD_MIB=4)
+    def test_hosted_upload_limit_is_enforced(self):
+        upload = SimpleUploadedFile("large.pdf", b"%PDF-" + b"x" * (4 * 1024 * 1024))
+        response = self.client.post(
+            "/api/resumes/", {"file": upload}, format="multipart"
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("4 MiB", str(response.data))
+
+    @override_settings(DEBUG=False, DEMO_ENABLED=True)
+    def test_sample_workspace_can_be_enabled_with_debug_off(self):
+        self.client.force_authenticate(None)
+        response = self.client.post("/api/auth/demo/", {}, format="json")
+        self.assertEqual(response.status_code, 201, response.data)
+        self.assertEqual(response.data["user"]["first_name"], "Alex")
