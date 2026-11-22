@@ -4,76 +4,156 @@ An explainable resume analysis and career planning application for an MCA Semest
 
 CareerLens runs locally without an AI API key. The default engine is explicitly labeled **rule-based**. Optional OpenAI-compatible provider enrichment produces learning advice only; extracted candidate facts and numerical scores remain deterministic.
 
-## Open the application
+## Run on your own device
 
-During development the application runs at **http://127.0.0.1:5173/** and the API at **http://127.0.0.1:8000/api/**. Select **Explore sample workspace** to create a separate MySQL-backed workspace containing clearly labeled synthetic resumes and jobs, or create your own empty account.
+The setup below provides commands for Linux, macOS and Windows PowerShell. MySQL runs in Docker; Python and Node.js run on your device. An existing MySQL installation can be used instead. Local execution was verified on Arch Linux; native Windows, macOS and the Docker alternative have not been executed here.
 
-## Requirements
+### 1. Install the prerequisites
 
-- Python 3.12, `uv`, Node.js 22.12+ and npm.
-- MySQL 8.0.11+ (8.4 recommended), accessible on loopback port 3307 by default.
-- Internet access for the first dependency installation. No spaCy model download is required.
-- This workstation also has a project-private MySQL 8.4.6 under `.runtime/`. It does not modify system services.
+| Tool | Requirement |
+| --- | --- |
+| [Git](https://git-scm.com/downloads) | To clone this repository |
+| [uv](https://docs.astral.sh/uv/getting-started/installation/) | Installs Python 3.12 and the backend dependencies |
+| [Node.js and npm](https://nodejs.org/en/download) | Node.js 22.12+ in the 22.x line, or Node.js 24.x |
+| [Docker with Compose](https://docs.docker.com/compose/install/) | Docker Desktop on Windows/macOS, or Docker Engine with the Compose plugin on Linux; start Docker before continuing |
 
-## Set up from scratch
+You need internet access for the initial dependency and database-image downloads. No AI subscription, API key or spaCy model download is required.
 
-### Option A: existing MySQL or Docker
+### 2. Clone and configure the project
 
-```bash
-cd /path/to/CareerLens
+Run these commands in a terminal (PowerShell on Windows):
+
+```sh
+git clone https://github.com/rushabhcodes/CareerLens.git
+cd CareerLens
+uv python install 3.12
 uv venv --python 3.12 .venv
-uv pip sync --python .venv/bin/python backend/requirements.lock
-.venv/bin/python scripts/create_env.py
+uv pip install --python .venv -r backend/requirements.lock
 ```
 
-`create_env.py` creates random local secrets without overwriting an existing `.env`. For an existing MySQL installation, edit `.env` to match its connection details, then adapt and execute [database-init.sql](docs/database-init.sql). Ensure the application account can create/drop only `test_careerlens` if you want to run Django tests.
+Activate the Python environment on **Linux/macOS**:
 
-If Docker Compose is installed:
+```sh
+source .venv/bin/activate
+```
 
-```bash
+Or on **Windows PowerShell**:
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+```
+
+If PowerShell blocks activation, use `.\.venv\Scripts\python.exe` in place of `python` in every command below. Activation is optional when you use that full executable path.
+
+From the repository root, create your local configuration:
+
+```sh
+python scripts/create_env.py
+```
+
+This creates `.env` with random Django and MySQL passwords. An existing `.env` is preserved. Keep it private; Git ignores `.env`, database files, administrator credentials and uploaded resumes. Each person creates their own accounts and database locally.
+
+### 3. Start MySQL
+
+From the repository root:
+
+```sh
 docker compose up -d db
+docker compose ps
 ```
 
-The Compose file provisions the main application database. To run Django's tests with Compose, grant the application user privileges on `test_careerlens.*` using a root connection. The private local database helper grants this scoped development permission automatically.
+Wait for the database status to show **healthy** before continuing. The first launch downloads MySQL 8.4 and creates the `careerlens` database and application user using your `.env`. Docker only runs the database, so you still need to start Django and React in step 5. Data persists in the `careerlens_mysql` Docker volume.
 
-Then initialize the application:
+The default connection is `127.0.0.1:3307`. If that port is occupied, change `MYSQL_PORT` in `.env` to an unused port before starting Compose. Both Compose and Django read this setting.
 
-```bash
-.venv/bin/python backend/manage.py migrate --noinput
-.venv/bin/python backend/manage.py seed_catalog
+**Using MySQL without Docker:** install MySQL 8.0.11 or newer (8.4 recommended), set the `MYSQL_*` values in `.env` to match it, then adapt and execute [database-init.sql](docs/database-init.sql) using a database administrator account. Replace its example password with `MYSQL_PASSWORD` from `.env`. Skip the Docker commands; the remaining steps are the same. Use Django migrations below to create the tables.
+
+### 4. Initialize the application
+
+In the terminal with the Python environment activated, from the repository root:
+
+```sh
+python backend/manage.py migrate --noinput
+python backend/manage.py seed_catalog
 npm --prefix frontend ci
-.venv/bin/python scripts/dev.py start
 ```
 
-### Option B: private MySQL on this Arch Linux workstation
+Migrations create the application tables; the seed command adds the shared skill and career catalogs. Both commands can be run again on an existing installation.
 
-```bash
+### 5. Start Django and React
+
+Keep **two terminals** open, both in the repository root.
+
+**Terminal 1 — backend:** activate `.venv` as shown in step 2, then run:
+
+```sh
+python backend/manage.py runserver 127.0.0.1:8000
+```
+
+**Terminal 2 — frontend:**
+
+```sh
+npm --prefix frontend run dev
+```
+
+Open **[http://127.0.0.1:5173/](http://127.0.0.1:5173/)**. Select **Explore sample workspace** for clearly labeled synthetic resumes and jobs, or create an account for your own empty workspace. Try the included [sample PDF](docs/sample-resume.pdf) or [sample DOCX](docs/sample-resume.docx) when uploading a resume. The backend API is at [http://127.0.0.1:8000/api/](http://127.0.0.1:8000/api/).
+
+### Stop and restart
+
+Press **Ctrl+C** in each server terminal. To stop the Docker database while keeping its data:
+
+```sh
+docker compose stop db
+```
+
+Next time, run `docker compose up -d db`, activate `.venv` in the backend terminal, and run the two commands in step 5. Dependency installation, secret generation and catalog initialization are only needed during setup or when the project changes.
+
+### Optional Arch Linux helpers
+
+On Arch Linux x86_64, you can use a private MySQL installation instead of Docker:
+
+```sh
 bash scripts/bootstrap.sh --local-mysql
 .venv/bin/python scripts/dev.py start
 ```
 
-The installer downloads the official Linux x86_64 generic MySQL binary into `.runtime/mysql`, extracts libaio locally if needed, initializes a private data directory and binds only to `127.0.0.1`. It requires `curl`, `tar`, `rg`, `pacman` and `bsdtar` on Arch. For other systems, use Option A rather than the Arch-specific libaio fallback. The pinned local binary is for reproducible demonstration; use a maintained MySQL release for deployment.
+The installer downloads the official Linux x86_64 MySQL binary into `.runtime/mysql`, extracts libaio locally if needed, initializes a private data directory and binds to `127.0.0.1`. It requires `uv`, Node.js/npm, `curl`, `tar`, `rg`, `pacman` and `bsdtar`. The pinned local binary is for reproducible demonstration; use a maintained MySQL release for deployment.
 
-### Subsequent starts and stops
+For later starts and stops:
 
-```bash
-.venv/bin/python scripts/local_mysql.py start   # if using the private database
+```sh
+.venv/bin/python scripts/local_mysql.py start
 .venv/bin/python scripts/dev.py start
 .venv/bin/python scripts/dev.py stop
-.venv/bin/python scripts/local_mysql.py stop    # leaves database files intact
+.venv/bin/python scripts/local_mysql.py stop
 ```
 
-Server logs are `.runtime/backend.log`, `.runtime/frontend.log` and `.runtime/mysql.log`. The dev helper starts only missing servers. The stop helper stops only processes it recorded in this checkout. For manual terminals use `cd backend && ../.venv/bin/python manage.py runserver 127.0.0.1:8000` and `cd frontend && npm run dev`.
+These helpers are for Linux; use the manual server commands above on Windows/macOS. Logs are `.runtime/backend.log`, `.runtime/frontend.log` and `.runtime/mysql.log`. The dev helper starts only missing servers and stops only processes it recorded in this checkout.
+
+### Troubleshooting
+
+| Problem | What to check |
+| --- | --- |
+| `uv`, `node`, `npm` or `docker` is not found | Install the prerequisite and reopen your terminal so its PATH is refreshed. |
+| Docker cannot connect to its daemon | Start Docker Desktop or the Docker Engine service. |
+| MySQL connection refused during migrations | Wait for `docker compose ps` to show healthy; check `MYSQL_HOST` and `MYSQL_PORT` in `.env`. Inspect startup errors with `docker compose logs db`. |
+| MySQL access denied | Verify the database user/password in `.env`. An existing Docker volume keeps its original credentials; editing `.env` does not reset database passwords. |
+| `ModuleNotFoundError` | Activate this checkout's `.venv`, or use its Python executable directly; repeat the dependency-install command in step 2. |
+| Frontend opens but API calls fail | Keep Django running on `127.0.0.1:8000`. Vite proxies API requests to that address. |
+| Port 8000 or 5173 is already in use | Stop the previous server using that port. If Vite selects a different port, free 5173 and restart to match the supplied origin configuration. |
+| A scanned PDF cannot be read | Use a PDF containing selectable text or a DOCX file; OCR is not configured. |
 
 ## Administration
 
-```bash
-.venv/bin/python backend/manage.py createsuperuser
+With `.venv` activated, run:
+
+```sh
+python backend/manage.py createsuperuser
 ```
 
 Use an email address along with the username. Sign in to the React app with the **email** and password. The staff navigation shows application statistics. Open **Django admin** from that page, or visit http://127.0.0.1:8000/admin/ and sign in with the **username** and password. Catalog management uses Django's staff/model permissions. Regular users cannot access operational statistics or catalog management.
 
-For the existing local demonstration administrator, read `.runtime/admin-credentials.txt` privately. To create one on a new checkout, run `.venv/bin/python scripts/create_local_admin.py`; it generates a random password once and stores it in that ignored, permission-restricted file. It does not change an existing administrator's credentials.
+Alternatively, run `python scripts/create_local_admin.py` to generate a local demonstration administrator. Read the credentials privately from `.runtime/admin-credentials.txt`. The helper generates a random password once and does not change an existing administrator's credentials. This file is ignored by Git.
 
 ## Optional AI provider
 
@@ -97,16 +177,37 @@ The **How scoring works** page and each report explain the formulas. None of the
 
 ## Verification
 
-```bash
-.venv/bin/python backend/manage.py test core --verbosity 2 --noinput
+Django's test runner creates and drops a separate `test_careerlens` database. With the default Docker setup, grant the application account access to that database first:
+
+```sh
+docker compose exec db mysql -u root -p
+```
+
+Enter `MYSQL_ROOT_PASSWORD` from `.env` at the password prompt, then run this SQL and `exit`:
+
+```sql
+GRANT ALL PRIVILEGES ON test_careerlens.* TO 'careerlens'@'%';
+```
+
+This SQL uses the default `MYSQL_USER=careerlens`; adapt it if you changed the username. The existing-MySQL initialization script and the private Linux database helper already include scoped test-database permissions.
+
+Then activate `.venv` and run from the repository root:
+
+```sh
+python backend/manage.py test core --verbosity 2 --noinput
 npm --prefix frontend test
 npm --prefix frontend run build
+```
+
+For browser tests, keep Django and Vite running as in step 5, then use a third terminal:
+
+```sh
 cd frontend
 npx playwright install chromium --only-shell
 npm run test:e2e
 ```
 
-Start Django and Vite before browser tests. The repository includes PDF and DOCX synthetic fixtures at `docs/sample-resume.*`. E2E tests create test-only accounts and exercise real APIs/MySQL. If you already have a compatible Chromium executable, set `PLAYWRIGHT_EXECUTABLE=/absolute/path/to/chrome-headless-shell`. Executed results and limits are in [TEST_RESULTS.md](docs/TEST_RESULTS.md).
+On Linux, Playwright may also require its browser system dependencies; install them with `npx playwright install-deps chromium`. E2E tests create test-only accounts, exercise real APIs/MySQL and refresh screenshots under `docs/screenshots/`. Run `python scripts/create_local_admin.py` from the root first to include the optional staff test; otherwise that test skips. If you already have a compatible Chromium executable, set the `PLAYWRIGHT_EXECUTABLE` environment variable to its absolute path. Executed results and limits are in [TEST_RESULTS.md](docs/TEST_RESULTS.md).
 
 ## Academic materials
 
@@ -117,7 +218,7 @@ Start Django and Vite before browser tests. The repository includes PDF and DOCX
 - [Step-by-step demonstration](docs/DEMONSTRATION.md)
 - [Development progress](DEVELOPMENT_PROGRESS.md)
 - `docs/screenshots/`: captured desktop and mobile module screens using synthetic data.
-- `outputs/`: final academic report and presentation reference.
+- [Editable academic report](outputs/CareerLens-Project-Report.docx) and [18-slide presentation](outputs/CareerLens-Academic-Presentation.pptx).
 
 ## Code map for beginners
 
