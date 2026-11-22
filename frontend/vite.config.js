@@ -1,0 +1,30 @@
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite'
+export default defineConfig({
+  plugins: [react(), tailwindcss()],
+  server: {
+    port: 5173,
+    strictPort: true,
+    proxy: {
+      '/api': 'http://127.0.0.1:8000',
+      '/admin': 'http://127.0.0.1:8000',
+      '/static': 'http://127.0.0.1:8000',
+    },
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          charts: ['recharts'],
+          vendor: ['react', 'react-dom', 'react-router-dom'],
+        },
+      },
+    },
+  },
+  test: {
+    environment: 'jsdom',
+    setupFiles: './src/test-setup.js',
+    exclude: ['e2e/**', 'node_modules/**'],
+  },
+})

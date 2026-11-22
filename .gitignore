@@ -1,0 +1,14 @@
+.venv/
+.runtime/
+.env
+__pycache__/
+*.py[cod]
+node_modules/
+frontend/dist/
+backend/private_media/
+backend/staticfiles/
+.pytest_cache/
+test-results/
+playwright-report/
+.DS_Store
+outputs/qa/

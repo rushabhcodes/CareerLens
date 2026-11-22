@@ -1,0 +1,546 @@
+{
+  "info": {
+    "name": "CareerLens API demonstration",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Run against a local CareerLens instance. Select docs/sample-resume.pdf in the upload request before running. Creates disposable test-only data. No real credentials are included."
+  },
+  "auth": {
+    "type": "apikey",
+    "apikey": [
+      {
+        "key": "key",
+        "value": "Authorization",
+        "type": "string"
+      },
+      {
+        "key": "value",
+        "value": "Token {{token}}",
+        "type": "string"
+      },
+      {
+        "key": "in",
+        "value": "header",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://127.0.0.1:8000/api"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "resume_id",
+      "value": ""
+    },
+    {
+      "key": "job_id",
+      "value": ""
+    },
+    {
+      "key": "match_id",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Register a test account",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/auth/register/",
+        "auth": {
+          "type": "noauth"
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"first_name\": \"Postman\",\n  \"last_name\": \"Tester\",\n  \"email\": \"{{run_email}}\",\n  \"password\": \"PostmanTest!Career42\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+              "var careerLensResponse = pm.response.json(); pm.collectionVariables.set(\"token\", careerLensResponse.token);"
+            ]
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.collectionVariables.set(\"run_email\", \"postman-\" + Date.now() + \"@example.com\");"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Read profile",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/auth/me/"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Update profile",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/auth/me/",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"headline\": \"Synthetic API test account\",\n  \"career_goal\": \"Demonstrate the CareerLens API\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Read skill catalog",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/skills/"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Upload synthetic PDF (choose file first)",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": "{{base_url}}/resumes/",
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "title",
+              "value": "Postman sample resume",
+              "type": "text"
+            },
+            {
+              "key": "file",
+              "type": "file",
+              "src": "sample-resume.pdf"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+              "var careerLensResponse = pm.response.json(); pm.collectionVariables.set(\"resume_id\", careerLensResponse.id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Read resume evidence",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/resumes/{{resume_id}}/"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "List resumes",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/resumes/?page=1"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Create job (detect skills from text)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/jobs/",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Postman backend role\",\n  \"company\": \"Test-only company\",\n  \"description\": \"Build reliable Python and Django REST APIs with Docker and automated testing.\",\n  \"experience_years\": 2,\n  \"qualification\": \"MCA\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+              "var careerLensResponse = pm.response.json(); pm.collectionVariables.set(\"job_id\", careerLensResponse.id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Edit job",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/jobs/{{job_id}}/",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"company\": \"Edited test-only company\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Analyze match",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/matches/",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"resume\": \"{{resume_id}}\",\n  \"job\": \"{{job_id}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+              "var careerLensResponse = pm.response.json(); pm.collectionVariables.set(\"match_id\", careerLensResponse.id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Read saved match and gap roadmap",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/matches/{{match_id}}/"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Generate local career recommendations",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/resumes/{{resume_id}}/recommend/",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"use_ai\": false\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Read career recommendations",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/careers/?resume={{resume_id}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Read dashboard from MySQL",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/dashboard/"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Read analysis history",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/history/"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Regular user cannot access system stats",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/system/"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 403\", () => pm.response.to.have.status(403));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Delete test job and dependent matches",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{base_url}}/jobs/{{job_id}}/"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 204\", () => pm.response.to.have.status(204));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Delete test resume and private file",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{base_url}}/resumes/{{resume_id}}/"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 204\", () => pm.response.to.have.status(204));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Logout and revoke token",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": "{{base_url}}/auth/logout/"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Revoked token rejected",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/auth/me/"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 401\", () => pm.response.to.have.status(401));"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

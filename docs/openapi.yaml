@@ -1,0 +1,1278 @@
+openapi: 3.0.3
+info:
+  title: CareerLens API
+  version: 1.0.0
+paths:
+  /api/auth/demo/:
+    post:
+      operationId: auth_demo_create
+      tags:
+      - auth
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionResponse'
+          description: ''
+  /api/auth/login/:
+    post:
+      operationId: auth_login_create
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionResponse'
+          description: ''
+  /api/auth/logout/:
+    post:
+      operationId: auth_logout_create
+      tags:
+      - auth
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/auth/me/:
+    get:
+      operationId: auth_me_retrieve
+      tags:
+      - auth
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+          description: ''
+    patch:
+      operationId: auth_me_partial_update
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedAccount'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedAccount'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedAccount'
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+          description: ''
+  /api/auth/register/:
+    post:
+      operationId: auth_register_create
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Register'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Register'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Register'
+        required: true
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionResponse'
+          description: ''
+  /api/careers/:
+    get:
+      operationId: careers_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - careers
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCareerList'
+          description: ''
+  /api/careers/{id}/:
+    get:
+      operationId: careers_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this career recommendation.
+        required: true
+      tags:
+      - careers
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Career'
+          description: ''
+  /api/dashboard/:
+    get:
+      operationId: dashboard_retrieve
+      tags:
+      - dashboard
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/history/:
+    get:
+      operationId: history_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - history
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedHistoryList'
+          description: ''
+  /api/history/{id}/:
+    get:
+      operationId: history_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this analysis history.
+        required: true
+      tags:
+      - history
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/History'
+          description: ''
+  /api/jobs/:
+    get:
+      operationId: jobs_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - jobs
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedJobList'
+          description: ''
+    post:
+      operationId: jobs_create
+      tags:
+      - jobs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Job'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Job'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Job'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Job'
+          description: ''
+  /api/jobs/{id}/:
+    get:
+      operationId: jobs_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this job description.
+        required: true
+      tags:
+      - jobs
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Job'
+          description: ''
+    put:
+      operationId: jobs_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this job description.
+        required: true
+      tags:
+      - jobs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Job'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Job'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Job'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Job'
+          description: ''
+    patch:
+      operationId: jobs_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this job description.
+        required: true
+      tags:
+      - jobs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedJob'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedJob'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedJob'
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Job'
+          description: ''
+    delete:
+      operationId: jobs_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this job description.
+        required: true
+      tags:
+      - jobs
+      security:
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/matches/:
+    get:
+      operationId: matches_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - matches
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedMatchList'
+          description: ''
+    post:
+      operationId: matches_create
+      tags:
+      - matches
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MatchRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MatchRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MatchRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Match'
+          description: ''
+  /api/matches/{id}/:
+    get:
+      operationId: matches_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this job match analysis.
+        required: true
+      tags:
+      - matches
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Match'
+          description: ''
+  /api/resumes/:
+    get:
+      operationId: resumes_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - resumes
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedResumeList'
+          description: ''
+    post:
+      operationId: resumes_create
+      tags:
+      - resumes
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ResumeUpload'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resume'
+          description: ''
+  /api/resumes/{id}/:
+    get:
+      operationId: resumes_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this resume.
+        required: true
+      tags:
+      - resumes
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resume'
+          description: ''
+    delete:
+      operationId: resumes_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this resume.
+        required: true
+      tags:
+      - resumes
+      security:
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/resumes/{id}/download/:
+    get:
+      operationId: resumes_download_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this resume.
+        required: true
+      tags:
+      - resumes
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: string
+                format: binary
+          description: ''
+  /api/resumes/{id}/recommend/:
+    post:
+      operationId: resumes_recommend_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this resume.
+        required: true
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - resumes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecommendationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RecommendationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RecommendationRequest'
+      security:
+      - tokenAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCareerList'
+          description: ''
+  /api/resumes/{id}/report/:
+    get:
+      operationId: resumes_report_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this resume.
+        required: true
+      tags:
+      - resumes
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resume'
+          description: ''
+  /api/skills/:
+    get:
+      operationId: skills_list
+      tags:
+      - skills
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Skill'
+          description: ''
+  /api/system/:
+    get:
+      operationId: system_retrieve
+      tags:
+      - system
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+components:
+  schemas:
+    Account:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          readOnly: true
+        is_staff:
+          type: boolean
+          readOnly: true
+          title: Staff status
+          description: Designates whether the user can log into this admin site.
+        headline:
+          type: string
+          maxLength: 160
+        location:
+          type: string
+          maxLength: 120
+        career_goal:
+          type: string
+          maxLength: 240
+      required:
+      - email
+      - id
+      - is_staff
+    Career:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        resume:
+          type: integer
+        resume_title:
+          type: string
+          readOnly: true
+        role_title:
+          type: string
+          readOnly: true
+        description:
+          type: string
+          readOnly: true
+        score:
+          type: number
+          format: double
+          maximum: 100
+          minimum: 0
+        result: {}
+        engine:
+          type: string
+          maxLength: 40
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - description
+      - id
+      - result
+      - resume
+      - resume_title
+      - role_title
+      - score
+    CategoryEnum:
+      enum:
+      - technical
+      - soft
+      - tool
+      type: string
+      description: |-
+        * `technical` - Technical
+        * `soft` - Soft
+        * `tool` - Tool
+    Extracted:
+      type: object
+      properties:
+        text:
+          type: string
+        candidate_name:
+          type: string
+          maxLength: 160
+        email:
+          type: string
+          maxLength: 254
+        phone:
+          type: string
+          maxLength: 60
+        sections: {}
+        experience_years:
+          type: number
+          format: double
+          nullable: true
+        warnings: {}
+      required:
+      - text
+    History:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        resume:
+          type: integer
+          nullable: true
+        kind:
+          type: string
+          maxLength: 30
+        title:
+          type: string
+          maxLength: 240
+        score:
+          type: number
+          format: double
+          nullable: true
+        detail: {}
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - kind
+      - title
+    ImportanceEnum:
+      enum:
+      - essential
+      - preferred
+      type: string
+      description: |-
+        * `essential` - Essential
+        * `preferred` - Preferred
+    Job:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 160
+        company:
+          type: string
+          maxLength: 160
+        description:
+          type: string
+          maxLength: 30000
+        experience_years:
+          type: number
+          format: double
+          maximum: 60
+          minimum: 0
+          nullable: true
+        qualification:
+          type: string
+          maxLength: 240
+        requirements:
+          type: array
+          items:
+            $ref: '#/components/schemas/Requirement'
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - description
+      - id
+      - title
+      - updated_at
+    LoginRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          writeOnly: true
+      required:
+      - email
+      - password
+    Match:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        resume:
+          type: integer
+          readOnly: true
+        resume_title:
+          type: string
+          readOnly: true
+        job:
+          type: integer
+          readOnly: true
+        job_title:
+          type: string
+          readOnly: true
+        company:
+          type: string
+          readOnly: true
+        score:
+          type: number
+          format: double
+          readOnly: true
+        engine:
+          type: string
+          readOnly: true
+        result:
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - company
+      - created_at
+      - engine
+      - id
+      - job
+      - job_title
+      - result
+      - resume
+      - resume_title
+      - score
+    MatchRequest:
+      type: object
+      properties:
+        resume:
+          type: integer
+          minimum: 1
+        job:
+          type: integer
+          minimum: 1
+      required:
+      - job
+      - resume
+    PaginatedCareerList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Career'
+    PaginatedHistoryList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/History'
+    PaginatedJobList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Job'
+    PaginatedMatchList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Match'
+    PaginatedResumeList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Resume'
+    PatchedAccount:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          readOnly: true
+        is_staff:
+          type: boolean
+          readOnly: true
+          title: Staff status
+          description: Designates whether the user can log into this admin site.
+        headline:
+          type: string
+          maxLength: 160
+        location:
+          type: string
+          maxLength: 120
+        career_goal:
+          type: string
+          maxLength: 240
+    PatchedJob:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 160
+        company:
+          type: string
+          maxLength: 160
+        description:
+          type: string
+          maxLength: 30000
+        experience_years:
+          type: number
+          format: double
+          maximum: 60
+          minimum: 0
+          nullable: true
+        qualification:
+          type: string
+          maxLength: 240
+        requirements:
+          type: array
+          items:
+            $ref: '#/components/schemas/Requirement'
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+    RecommendationRequest:
+      type: object
+      properties:
+        use_ai:
+          type: boolean
+          default: false
+    Register:
+      type: object
+      properties:
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          maxLength: 150
+        password:
+          type: string
+          writeOnly: true
+          maxLength: 128
+      required:
+      - email
+      - first_name
+      - password
+    Requirement:
+      type: object
+      properties:
+        skill:
+          type: integer
+        name:
+          type: string
+          readOnly: true
+        category:
+          type: string
+          readOnly: true
+        importance:
+          $ref: '#/components/schemas/ImportanceEnum'
+      required:
+      - category
+      - name
+      - skill
+    Resume:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          readOnly: true
+        original_filename:
+          type: string
+          readOnly: true
+        file_size:
+          type: integer
+          readOnly: true
+        quality_score:
+          type: integer
+          readOnly: true
+        quality_report:
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        extracted:
+          allOf:
+          - $ref: '#/components/schemas/Extracted'
+          readOnly: true
+        skill_evidence:
+          type: array
+          items:
+            $ref: '#/components/schemas/ResumeSkill'
+          readOnly: true
+      required:
+      - created_at
+      - extracted
+      - file_size
+      - id
+      - original_filename
+      - quality_report
+      - quality_score
+      - skill_evidence
+      - title
+    ResumeSkill:
+      type: object
+      properties:
+        skill:
+          allOf:
+          - $ref: '#/components/schemas/Skill'
+          readOnly: true
+        evidence:
+          type: string
+          maxLength: 500
+      required:
+      - evidence
+      - skill
+    ResumeUpload:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 160
+        file:
+          type: string
+          format: uri
+      required:
+      - file
+    SessionResponse:
+      type: object
+      properties:
+        token:
+          type: string
+        user:
+          $ref: '#/components/schemas/Account'
+      required:
+      - token
+      - user
+    Skill:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 100
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+      required:
+      - category
+      - id
+      - name
+  securitySchemes:
+    tokenAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: Token-based authentication with required prefix "Token"

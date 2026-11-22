@@ -1,0 +1,6 @@
+digraph G {graph [bgcolor="white",pad="0.25",nodesep="0.35",ranksep="0.6",fontname="Arial"]; node [fontname="Arial",fontsize=13,shape=box,style="rounded,filled",fillcolor="#f0f6ee",color="#9eb89b",fontcolor="#274c34",margin="0.17,0.12"]; edge [fontname="Arial",fontsize=10,color="#71916b",fontcolor="#647c5a",arrowsize=0.7]; rankdir=TB; user[label="Job seeker"]; react[label="React + Vite
+Tailwind + Recharts"]; api[label="Django REST API
+Authentication and ownership"]; service[label="Service layer
+Parsing and scoring"]; mysql[label="MySQL
+Relational records",shape=cylinder]; files[label="Private resume files",shape=folder]; llm[label="Optional HTTPS LLM
+Validated advice only"];admin[label="Staff / Django admin"]; user->react;react->api[label="Token + JSON / multipart"];api->service;api->mysql;api->files;service->llm[label="Explicit opt-in"];admin->api;}
